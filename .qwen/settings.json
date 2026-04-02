@@ -10,7 +10,16 @@
       "Bash(psql *)",
       "Bash(pg_isready *)",
       "Bash(systemctl *)",
-      "Bash(service *)"
+      "Bash(service *)",
+      "Bash(mv *)",
+      "Bash(docker compose up *)",
+      "Bash(true)",
+      "Bash(npx *)",
+      "Bash(pkill *)",
+      "Bash(node *)",
+      "Bash(curl *)",
+      "Bash(sleep *)",
+      "Bash(xargs *)"
     ]
   },
   "$version": 3

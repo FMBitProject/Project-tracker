@@ -1,18 +1,19 @@
-import { auth } from "@/auth";
+import { auth } from "./src/auth";
 import { NextRequest, NextResponse } from "next/server";
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
+    const isAuthPage = request.nextUrl.pathname.startsWith("/auth");
+    const isApiRoute = request.nextUrl.pathname.startsWith("/api");
+
+    // Allow public access to auth pages and all API routes
+    // API routes handle their own authentication
+    if (isAuthPage || isApiRoute) {
+        return NextResponse.next();
+    }
+
     const session = await auth.api.getSession({
         headers: request.headers,
     });
-
-    const isAuthPage = request.nextUrl.pathname.startsWith("/auth");
-    const isApiAuth = request.nextUrl.pathname.startsWith("/api/auth");
-
-    // Allow public access to auth pages and auth API
-    if (isAuthPage || isApiAuth) {
-        return NextResponse.next();
-    }
 
     // Redirect to sign in if not authenticated
     if (!session) {

@@ -67,7 +67,10 @@ export function Sidebar() {
                     <Button
                         variant="ghost"
                         className="w-full justify-start gap-3 text-muted-foreground"
-                        onClick={() => signOut()}
+                        onClick={async () => {
+                            await signOut();
+                            window.location.href = "/auth/signin";
+                        }}
                     >
                         <LogOut className="h-5 w-5" />
                         Sign Out
