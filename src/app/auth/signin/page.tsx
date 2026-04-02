@@ -13,27 +13,41 @@ function SignInForm() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const callbackUrl = searchParams.get("callbackUrl") || "/dashboard";
+    const registered = searchParams.get("registered") === "true";
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [success, setSuccess] = useState<string | null>(null);
+
+    // Show success message if user just registered
+    if (registered && !success) {
+        setSuccess("Account created successfully! Please sign in.");
+    }
 
     async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
         setIsLoading(true);
         setError(null);
+        setSuccess(null);
 
         const formData = new FormData(e.currentTarget);
         const email = formData.get("email") as string;
         const password = formData.get("password") as string;
 
         try {
+            console.log("Signing in with:", email);
             const result = await signIn.email({ email, password });
+            console.log("Sign in result:", result);
+            
             if (result.error) {
+                console.error("Sign in error:", result.error);
                 setError(result.error.message || "Sign in failed");
             } else {
+                console.log("Sign in successful, redirecting to", callbackUrl);
                 router.push(callbackUrl);
                 router.refresh();
             }
         } catch (err) {
+            console.error("Unexpected error during sign in:", err);
             setError("An unexpected error occurred");
         } finally {
             setIsLoading(false);
@@ -46,6 +60,11 @@ function SignInForm() {
                 {error && (
                     <div className="p-3 text-sm text-destructive bg-destructive/10 rounded-md">
                         {error}
+                    </div>
+                )}
+                {success && (
+                    <div className="p-3 text-sm text-green-600 bg-green-50 dark:bg-green-900/20 rounded-md">
+                        {success}
                     </div>
                 )}
                 <div className="space-y-2">

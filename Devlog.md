@@ -1,5 +1,57 @@
 # Development Log - Project Tracker & Timeline
 
+## [2026-04-02] - Authentication Pages Improvements
+
+### Summary
+Enhanced authentication pages with better error handling, validation, and user feedback for sign up flow.
+
+### Changes Made
+
+#### 1. Sign Up Page Improvements (`/src/app/auth/signup/page.tsx`)
+- **Added password validation**: Minimum 8 characters requirement
+- **Enhanced error handling**: 
+  - Console logging for debugging
+  - More descriptive error messages
+  - Database connection error detection
+- **Improved UI feedback**:
+  - Error messages with border styling
+  - Password minimum length hint
+  - Input validation with `minLength` attributes
+- **Post-registration redirect**: Redirects to signin with `?registered=true` query param
+
+#### 2. Sign In Page Improvements (`/src/app/auth/signin/page.tsx`)
+- **Added success message**: Shows "Account created successfully!" after registration
+- **Enhanced console logging**: Debug logs for sign in flow
+- **Better error messages**: More descriptive error handling
+
+#### 3. Database Setup Documentation
+- **Created `DATABASE_SETUP.md`**: Comprehensive guide for setting up PostgreSQL
+  - Neon (cloud PostgreSQL) setup
+  - Local PostgreSQL installation (Ubuntu/macOS)
+  - Docker setup
+  - Troubleshooting common errors
+  - Environment variables reference
+
+### Known Issue: Database Required
+
+**Problem**: Sign up form reloads without creating account
+
+**Root Cause**: PostgreSQL database not running or not configured
+
+**Solution**: 
+1. Set up PostgreSQL (see `DATABASE_SETUP.md`)
+2. Recommended: Use [Neon](https://neon.tech) for free cloud PostgreSQL
+3. Run `npm run db:push` to create database tables
+4. Restart dev server
+
+**Debug Steps**:
+1. Open browser console (F12)
+2. Try to sign up
+3. Check Console tab for error messages
+4. Check Network tab → `/api/auth/email/sign-up` for server errors
+
+---
+
 ## [2026-04-02] - Authentication Pages & Sign Up Flow
 
 ### Summary

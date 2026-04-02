@@ -4,7 +4,13 @@
       "Bash(npm install *)",
       "Bash(mkdir *)",
       "Bash(npm run *)",
-      "Bash(git diff *)"
+      "Bash(git diff *)",
+      "Bash(docker-compose *)",
+      "Bash(docker ps *)",
+      "Bash(psql *)",
+      "Bash(pg_isready *)",
+      "Bash(systemctl *)",
+      "Bash(service *)"
     ]
   },
   "$version": 3

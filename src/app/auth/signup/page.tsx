@@ -24,19 +24,33 @@ export default function SignUpPage() {
         const email = formData.get("email") as string;
         const password = formData.get("password") as string;
 
+        // Validate password length
+        if (password.length < 8) {
+            setError("Password must be at least 8 characters long");
+            setIsLoading(false);
+            return;
+        }
+
         try {
+            console.log("Signing up with:", { email, name });
             const result = await signUp.email({
                 email,
                 password,
                 name,
             });
+            
+            console.log("Sign up result:", result);
+            
             if (result.error) {
-                setError(result.error.message || "Sign up failed");
+                console.error("Sign up error:", result.error);
+                setError(result.error.message || "Sign up failed. Please try again.");
             } else {
-                router.push("/auth/signin");
+                console.log("Sign up successful, redirecting to signin");
+                router.push("/auth/signin?registered=true");
             }
         } catch (err) {
-            setError("An unexpected error occurred");
+            console.error("Unexpected error during sign up:", err);
+            setError("An unexpected error occurred. Please check your database connection and try again.");
         } finally {
             setIsLoading(false);
         }
@@ -54,8 +68,8 @@ export default function SignUpPage() {
                 <form onSubmit={handleSubmit}>
                     <CardContent className="space-y-4">
                         {error && (
-                            <div className="p-3 text-sm text-destructive bg-destructive/10 rounded-md">
-                                {error}
+                            <div className="p-3 text-sm text-destructive bg-destructive/10 rounded-md border border-destructive/20">
+                                <strong>Error:</strong> {error}
                             </div>
                         )}
                         <div className="space-y-2">
@@ -67,6 +81,7 @@ export default function SignUpPage() {
                                 placeholder="John Doe"
                                 required
                                 disabled={isLoading}
+                                minLength={2}
                             />
                         </div>
                         <div className="space-y-2">
@@ -88,7 +103,9 @@ export default function SignUpPage() {
                                 type="password"
                                 required
                                 disabled={isLoading}
+                                minLength={8}
                             />
+                            <p className="text-xs text-muted-foreground">Minimum 8 characters</p>
                         </div>
                     </CardContent>
                     <CardFooter className="flex flex-col space-y-4">
