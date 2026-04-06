@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { db } from "@/db";
 import { tasks, projects } from "@/db/schema";
-import { eq, and, desc } from "drizzle-orm";
+import { eq, and, desc, inArray } from "drizzle-orm";
 import { createTaskSchema } from "@/app/types";
 
 export async function GET(request: NextRequest) {
@@ -24,20 +24,20 @@ export async function GET(request: NextRequest) {
             userTasks = await db.select().from(tasks).where(and(eq(tasks.projectId, projectId), eq(tasks.userId, session.user.id))).orderBy(desc(tasks.createdAt));
         } else {
             userTasks = await db.select().from(tasks).where(eq(tasks.userId, session.user.id)).orderBy(desc(tasks.createdAt));
-            
-            // Include project info
-            const projectIds = userTasks.map(t => t.projectId);
+
+            // Include project info for ALL tasks
+            const uniqueProjectIds = [...new Set(userTasks.map(t => t.projectId))];
             let allProjects: any[] = [];
-            
-            if (projectIds.length > 0) {
-                allProjects = await db.select().from(projects).where(eq(projects.id, projectIds[0]));
+
+            if (uniqueProjectIds.length > 0) {
+                allProjects = await db.select().from(projects).where(inArray(projects.id, uniqueProjectIds));
             }
-            
+
             const projectsMap = allProjects.reduce((acc, p) => {
                 acc[p.id] = { id: p.id, name: p.name };
                 return acc;
             }, {} as Record<string, { id: string; name: string }>);
-            
+
             userTasks = userTasks.map(t => ({
                 ...t,
                 project: projectsMap[t.projectId] || null,

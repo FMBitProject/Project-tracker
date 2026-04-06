@@ -14,12 +14,15 @@ export async function GET(request: NextRequest) {
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
         }
 
+        const searchParams = request.nextUrl.searchParams;
+        const includeTasks = searchParams.get("includeTasks") === "true";
+
         const userProjects = await db.select().from(projects).where(eq(projects.userId, session.user.id)).orderBy(projects.createdAt);
 
         // Fetch tasks for all projects
         const projectIds = userProjects.map(p => p.id);
         let allTasks: any[] = [];
-        
+
         if (projectIds.length > 0) {
             allTasks = await db.select().from(tasks).where(inArray(tasks.projectId, projectIds));
         }
@@ -43,7 +46,7 @@ export async function GET(request: NextRequest) {
                 (t: any) => t.status !== "done" && new Date(t.endDate) < new Date()
             ).length;
 
-            return {
+            const result: any = {
                 ...project,
                 summary: {
                     totalTasks,
@@ -53,6 +56,12 @@ export async function GET(request: NextRequest) {
                     progress: totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0,
                 },
             };
+
+            if (includeTasks) {
+                result.tasks = projectTasks;
+            }
+
+            return result;
         });
 
         return NextResponse.json(projectsWithSummary);
