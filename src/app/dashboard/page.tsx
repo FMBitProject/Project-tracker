@@ -8,7 +8,7 @@ import {
 import { 
   LayoutDashboard, 
   CheckCircle, 
-  AlertCircle, 
+  AlertTriangle, 
   Clock, 
   FolderOpen, 
   Plus 
@@ -21,81 +21,84 @@ export default function DashboardPage() {
       {/* Header Section */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
+          <h1 className="text-4xl font-extrabold bg-gradient-to-r from-blue-500 to-purple-600 bg-clip-text text-transparent tracking-tight pb-1">
+            Dashboard
+          </h1>
           <p className="text-sm text-muted-foreground mt-1">
-            Ringkasan status proyek dan tugas kamu saat ini.
+            Overview of your current projects and tasks.
           </p>
         </div>
-        <Button>
+        <Button className="bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600 text-white border-0 shadow-md transition-all">
           <Plus className="mr-2 h-4 w-4" /> New Project
         </Button>
       </div>
 
       {/* Statistic Cards (Grid Layout) */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
         
         {/* Card 1: Total Tasks */}
-        <Card>
+        <Card className="bg-gradient-to-br from-blue-300 to-blue-400 border-0 shadow-md text-slate-900 transition-transform hover:-translate-y-1">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Tasks</CardTitle>
-            <LayoutDashboard className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-semibold">Total Tasks</CardTitle>
+            <LayoutDashboard className="h-5 w-5 opacity-75" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">0</div>
+            <div className="text-3xl font-bold">0</div>
+            <p className="text-xs font-medium opacity-80 mt-1">Tasks</p>
           </CardContent>
         </Card>
 
         {/* Card 2: Completed */}
-        <Card>
+        <Card className="bg-gradient-to-br from-green-300 to-green-400 border-0 shadow-md text-slate-900 transition-transform hover:-translate-y-1">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Completed</CardTitle>
-            <CheckCircle className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-semibold">Completed</CardTitle>
+            <CheckCircle className="h-5 w-5 opacity-75" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">0</div>
-            <p className="text-xs text-muted-foreground mt-1">0% completion rate</p>
+            <div className="text-3xl font-bold">0</div>
+            <p className="text-xs font-medium opacity-80 mt-1">0% completion rate</p>
           </CardContent>
         </Card>
 
         {/* Card 3: Critical */}
-        <Card>
+        <Card className="bg-gradient-to-br from-red-300 to-red-400 border-0 shadow-md text-slate-900 transition-transform hover:-translate-y-1">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Critical</CardTitle>
-            <AlertCircle className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-semibold">Critical</CardTitle>
+            <AlertTriangle className="h-5 w-5 opacity-75" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">0</div>
-            <p className="text-xs text-muted-foreground mt-1">High priority tasks</p>
+            <div className="text-3xl font-bold">0</div>
+            <p className="text-xs font-medium opacity-80 mt-1">High priority tasks</p>
           </CardContent>
         </Card>
 
         {/* Card 4: Overdue */}
-        <Card>
+        <Card className="bg-gradient-to-br from-orange-300 to-amber-400 border-0 shadow-md text-slate-900 transition-transform hover:-translate-y-1">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Overdue</CardTitle>
-            <Clock className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-semibold">Overdue</CardTitle>
+            <Clock className="h-5 w-5 opacity-75" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">0</div>
-            <p className="text-xs text-muted-foreground mt-1">Past deadline</p>
+            <div className="text-3xl font-bold">0</div>
+            <p className="text-xs font-medium opacity-80 mt-1">Past deadline</p>
           </CardContent>
         </Card>
 
       </div>
 
       {/* Empty State Projects Section */}
-      <div className="mt-8">
-        <h2 className="text-xl font-semibold tracking-tight mb-4">Projects</h2>
+      <div className="mt-10">
+        <h2 className="text-xl font-bold tracking-tight mb-4 text-slate-800">Projects</h2>
         
-        <Card className="flex flex-col items-center justify-center border-dashed py-16 px-4 text-center bg-muted/20">
-          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-background shadow-sm mb-4">
-             <FolderOpen className="h-8 w-8 text-muted-foreground" />
+        <Card className="flex flex-col items-center justify-center border-0 shadow-lg py-16 px-4 text-center bg-gradient-to-r from-blue-50 to-purple-100">
+          <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-white shadow-md mb-6">
+             <FolderOpen className="h-8 w-8 text-indigo-500" />
           </div>
-          <h3 className="text-lg font-semibold">No projects yet</h3>
-          <p className="mt-2 text-sm text-muted-foreground max-w-sm">
+          <h3 className="text-2xl font-bold text-slate-800">No projects yet</h3>
+          <p className="mt-2 text-sm text-slate-600 max-w-sm">
             Create your first project to start tracking tasks and organizing your workflow.
           </p>
-          <Button variant="outline" className="mt-6">
+          <Button className="mt-8 bg-gradient-to-r from-orange-400 to-pink-500 hover:from-orange-500 hover:to-pink-600 text-white border-0 shadow-md transition-all hover:scale-105">
             <Plus className="mr-2 h-4 w-4" /> Create Project
           </Button>
         </Card>
