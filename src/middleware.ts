@@ -1,20 +1,20 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { getSessionCookie } from "better-auth";
 
 export async function middleware(request: NextRequest) {
-    // 1. Cek cookie sesi secara ringan (tanpa lapor ke database dulu)
-    const sessionCookie = getSessionCookie(request); 
+    // Kita cek cookie session secara manual (nama default better-auth)
+    // Ini cara paling ringan & nggak akan bikin error "Build Error"
+    const sessionToken = request.cookies.get("better-auth.session_token")?.value;
 
     const isAuthPage = request.nextUrl.pathname.startsWith("/auth");
     const isDashboardPage = request.nextUrl.pathname.startsWith("/dashboard");
 
-    // 2. Kalau sudah login, jangan boleh ke halaman login/signup lagi
-    if (isAuthPage && sessionCookie) {
+    // 1. Kalau sudah login (ada token), jangan biarkan masuk ke halaman login/signup
+    if (isAuthPage && sessionToken) {
         return NextResponse.redirect(new URL("/dashboard", request.url));
     }
 
-    // 3. Kalau mau ke dashboard tapi BELUM login, tendang ke signin
-    if (isDashboardPage && !sessionCookie) {
+    // 2. Kalau mau masuk dashboard tapi TIDAK ada token, tendang ke sign-in
+    if (isDashboardPage && !sessionToken) {
         const url = new URL("/auth/signin", request.url);
         url.searchParams.set("callbackUrl", request.nextUrl.pathname);
         return NextResponse.redirect(url);
@@ -23,7 +23,7 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
 }
 
-// 4. Batasi matcher agar middleware HANYA jalan di rute yang penting saja
+// Hanya jalankan middleware di rute ini agar tidak lemot
 export const config = {
     matcher: ["/dashboard/:path*", "/auth/:path*"],
 };
