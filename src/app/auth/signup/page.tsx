@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { signUp } from "@/auth/client";
@@ -12,7 +12,6 @@ import { AlertCircle, CheckCircle2 } from "lucide-react";
 
 export default function SignUpPage() {
     const router = useRouter();
-    const [isPending, startTransition] = useTransition();
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [success, setSuccess] = useState<string | null>(null);
@@ -67,14 +66,12 @@ export default function SignUpPage() {
             } else {
                 console.log("Sign up successful, redirecting to signin");
                 setSuccess("Account created successfully! Redirecting to sign in...");
-                
-                // Use transition for smooth redirect
-                startTransition(() => {
-                    // Give user a moment to see success message
-                    setTimeout(() => {
-                        router.push("/auth/signin?registered=true");
-                    }, 1000);
-                });
+
+                // Use window.location.href for a full page reload to ensure
+                // the new session cookies are recognized by the middleware
+                setTimeout(() => {
+                    window.location.href = "/auth/signin?registered=true";
+                }, 1000);
             }
         } catch (err) {
             console.error("Unexpected error during sign up:", err);
@@ -121,7 +118,7 @@ export default function SignUpPage() {
                                 type="text"
                                 placeholder="John Doe"
                                 required
-                                disabled={isLoading || isPending}
+                                disabled={isLoading}
                                 minLength={2}
                                 autoComplete="name"
                             />
@@ -134,7 +131,7 @@ export default function SignUpPage() {
                                 type="email"
                                 placeholder="you@example.com"
                                 required
-                                disabled={isLoading || isPending}
+                                disabled={isLoading}
                                 autoComplete="email"
                             />
                         </div>
@@ -145,7 +142,7 @@ export default function SignUpPage() {
                                 name="password"
                                 type="password"
                                 required
-                                disabled={isLoading || isPending}
+                                disabled={isLoading}
                                 minLength={8}
                                 autoComplete="new-password"
                             />
@@ -153,12 +150,12 @@ export default function SignUpPage() {
                         </div>
                     </CardContent>
                     <CardFooter className="flex flex-col space-y-4">
-                        <Button 
-                            type="submit" 
-                            className="w-full" 
-                            disabled={isLoading || isPending}
+                        <Button
+                            type="submit"
+                            className="w-full"
+                            disabled={isLoading}
                         >
-                            {isLoading || isPending ? (
+                            {isLoading ? (
                                 <>
                                     <svg className="animate-spin -ml-1 mr-2 h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                                         <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>

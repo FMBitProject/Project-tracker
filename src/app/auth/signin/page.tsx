@@ -24,7 +24,12 @@ function SignInForm() {
     }
 
     async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+        // Block ALL default form behavior immediately
         e.preventDefault();
+        e.stopPropagation();
+
+        if (isLoading) return;
+
         setIsLoading(true);
         setError(null);
         setSuccess(null);
@@ -34,28 +39,40 @@ function SignInForm() {
         const password = formData.get("password") as string;
 
         try {
-            console.log("Signing in with:", email);
-            const result = await signIn.email({ email, password });
-            console.log("Sign in result:", result);
-            
-            if (result.error) {
-                console.error("Sign in error:", result.error);
+            const result = await signIn.email({
+                email,
+                password,
+                callbackURL: callbackUrl,
+            });
+
+            console.log("[SignIn] Result:", result);
+
+            if (result?.error) {
                 setError(result.error.message || "Sign in failed");
-            } else {
-                console.log("Sign in successful, redirecting to", callbackUrl);
-                router.push(callbackUrl);
-                router.refresh();
+                setIsLoading(false);
+                return;
             }
+
+            if (!result?.data) {
+                setError("Sign in returned no data");
+                setIsLoading(false);
+                return;
+            }
+
+            console.log("[SignIn] Success — redirecting to:", callbackUrl);
+
+            // Use Next.js router for client-side navigation
+            router.push(callbackUrl);
+            router.refresh();
         } catch (err) {
-            console.error("Unexpected error during sign in:", err);
+            console.error("[SignIn] Caught exception:", err);
             setError("An unexpected error occurred");
-        } finally {
             setIsLoading(false);
         }
     }
 
     return (
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} action="#">
             <CardContent className="space-y-4">
                 {error && (
                     <div className="p-3 text-sm text-destructive bg-destructive/10 rounded-md">
@@ -76,6 +93,7 @@ function SignInForm() {
                         placeholder="you@example.com"
                         required
                         disabled={isLoading}
+                        autoComplete="email"
                     />
                 </div>
                 <div className="space-y-2">
@@ -86,6 +104,7 @@ function SignInForm() {
                         type="password"
                         required
                         disabled={isLoading}
+                        autoComplete="current-password"
                     />
                 </div>
             </CardContent>

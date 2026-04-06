@@ -35,7 +35,8 @@
       "Bash(grep *)",
       "Bash(touch *)",
       "Bash(cat *)",
-      "Bash(find *)"
+      "Bash(find *)",
+      "Bash(source *)"
     ]
   },
   "$version": 3
