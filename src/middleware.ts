@@ -1,21 +1,20 @@
-import { auth } from "@/auth";
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse, type NextRequest } from "next/server";
+import { getSessionCookie } from "better-auth";
 
 export async function middleware(request: NextRequest) {
-    const isAuthPage = request.nextUrl.pathname.startsWith("/auth");
-    const isApiAuth = request.nextUrl.pathname.startsWith("/api/auth");
+    // 1. Cek cookie sesi secara ringan (tanpa lapor ke database dulu)
+    const sessionCookie = getSessionCookie(request); 
 
-    // Allow public access to auth pages and auth API
-    if (isAuthPage || isApiAuth) {
-        return NextResponse.next();
+    const isAuthPage = request.nextUrl.pathname.startsWith("/auth");
+    const isDashboardPage = request.nextUrl.pathname.startsWith("/dashboard");
+
+    // 2. Kalau sudah login, jangan boleh ke halaman login/signup lagi
+    if (isAuthPage && sessionCookie) {
+        return NextResponse.redirect(new URL("/dashboard", request.url));
     }
 
-    const session = await auth.api.getSession({
-        headers: request.headers,
-    });
-
-    // Redirect to sign in if not authenticated
-    if (!session) {
+    // 3. Kalau mau ke dashboard tapi BELUM login, tendang ke signin
+    if (isDashboardPage && !sessionCookie) {
         const url = new URL("/auth/signin", request.url);
         url.searchParams.set("callbackUrl", request.nextUrl.pathname);
         return NextResponse.redirect(url);
@@ -24,6 +23,7 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
 }
 
+// 4. Batasi matcher agar middleware HANYA jalan di rute yang penting saja
 export const config = {
-    matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"],
+    matcher: ["/dashboard/:path*", "/auth/:path*"],
 };

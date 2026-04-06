@@ -6,6 +6,7 @@ import * as schema from "@/db/schema"; // Mengambil semua tabel dari schema
 export const auth = betterAuth({
     database: drizzleAdapter(db, {
         provider: "pg",
+        useSessionToken: true,
         schema: {
             user: schema.user,
             session: schema.session,
