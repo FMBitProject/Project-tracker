@@ -6,9 +6,8 @@ export const user = pgTable("user", {
     id: text("id").primaryKey(),
     name: text("name").notNull(),
     email: text("email").notNull().unique(),
-    emailVerified: timestamp("emailVerified", { mode: "date" }),
+    emailVerified: boolean("emailVerified").notNull().default(false), // <-- Ini yang diubah
     image: text("image"),
-    // Tambahkan $defaultFn untuk menjamin ini adalah Date object
     createdAt: timestamp("createdAt", { mode: "date" }).$defaultFn(() => new Date()).notNull(),
     updatedAt: timestamp("updatedAt", { mode: "date" }).$defaultFn(() => new Date()).$onUpdate(() => new Date()).notNull(),
 });

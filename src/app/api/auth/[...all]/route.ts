@@ -1,5 +1,5 @@
-import { auth } from "@/auth";
+// Pastikan path-nya benar ke @/lib/auth
+import { auth } from "@/lib/auth"; 
+import { toNextJsHandler } from "better-auth/next-js";
 
-// Handle all auth requests
-export const GET = (req: Request) => auth.handler(req);
-export const POST = (req: Request) => auth.handler(req);
+export const { GET, POST } = toNextJsHandler(auth);

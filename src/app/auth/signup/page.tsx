@@ -61,7 +61,7 @@ export default function SignUpPage() {
             console.log("Sign up result:", result);
 
             if (result.error) {
-                console.error("Sign up error:", result.error);
+                console.log("Sign up error:", result.error);
                 setError(result.error.message || "Sign up failed. Please try again.");
             } else {
                 console.log("Sign up successful, redirecting to signin");
