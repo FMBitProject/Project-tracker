@@ -3,31 +3,28 @@
 import { useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { signIn } from "@/auth/client";
+import { signIn } from "@/auth/client"; // Pastikan path ini benar (biasanya @/lib/auth-client atau @/auth/client)
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 
 function SignInForm() {
-    const router = useRouter();
     const searchParams = useSearchParams();
     const callbackUrl = searchParams.get("callbackUrl") || "/dashboard";
     const registered = searchParams.get("registered") === "true";
+    
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [success, setSuccess] = useState<string | null>(null);
 
-    // Show success message if user just registered
+    // Tampilkan pesan sukses jika user baru saja mendaftar
     if (registered && !success) {
         setSuccess("Account created successfully! Please sign in.");
     }
 
     async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-        // Block ALL default form behavior immediately
         e.preventDefault();
-        e.stopPropagation();
-
         if (isLoading) return;
 
         setIsLoading(true);
@@ -39,10 +36,10 @@ function SignInForm() {
         const password = formData.get("password") as string;
 
         try {
+            // Melakukan proses login
             const result = await signIn.email({
                 email,
                 password,
-                callbackURL: callbackUrl,
             });
 
             console.log("[SignIn] Result:", result);
@@ -53,17 +50,14 @@ function SignInForm() {
                 return;
             }
 
-            if (!result?.data) {
-                setError("Sign in returned no data");
-                setIsLoading(false);
-                return;
+            // JURUS PAMUNGKAS: Hard Redirect
+            // Menggunakan window.location.href memaksa browser memuat ulang halaman secara total.
+            // Ini memastikan Cookie sesi tersimpan dengan benar sebelum masuk Dashboard.
+            if (result?.data) {
+                console.log("[SignIn] Success — Redirecting to:", callbackUrl);
+                window.location.href = callbackUrl; 
             }
 
-            console.log("[SignIn] Success — redirecting to:", callbackUrl);
-
-            // Use Next.js router for client-side navigation
-            router.push(callbackUrl);
-            router.refresh();
         } catch (err) {
             console.error("[SignIn] Caught exception:", err);
             setError("An unexpected error occurred");
@@ -93,7 +87,7 @@ function SignInForm() {
                         placeholder="you@example.com"
                         required
                         disabled={isLoading}
-                        autoComplete="email"
+                        // autoComplete dihapus untuk mencegah Hydration Error (layar merah)
                     />
                 </div>
                 <div className="space-y-2">
@@ -104,7 +98,7 @@ function SignInForm() {
                         type="password"
                         required
                         disabled={isLoading}
-                        autoComplete="current-password"
+                        // autoComplete dihapus untuk mencegah Hydration Error (layar merah)
                     />
                 </div>
             </CardContent>
@@ -133,7 +127,7 @@ export default function SignInPage() {
                         Enter your email and password to access your account
                     </CardDescription>
                 </CardHeader>
-                <Suspense fallback={<div className="p-6">Loading...</div>}>
+                <Suspense fallback={<div className="p-6 text-center">Loading form...</div>}>
                     <SignInForm />
                 </Suspense>
             </Card>
