@@ -1,5 +1,5 @@
 {
-  "id": "6abc42a3-e1ab-467e-a68d-6502eca0635e",
+  "id": "de439168-8fb3-42b3-9813-a87fc7db2673",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -293,9 +293,9 @@
           "primaryKey": false,
           "notNull": false
         },
-        "priority": {
-          "name": "priority",
-          "type": "priority",
+        "task_priority": {
+          "name": "task_priority",
+          "type": "task_priority",
           "typeSchema": "public",
           "primaryKey": false,
           "notNull": true,

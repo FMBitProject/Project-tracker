@@ -41,7 +41,7 @@ CREATE TABLE "tasks" (
 	"user_id" text NOT NULL,
 	"title" varchar(255) NOT NULL,
 	"content" text,
-	"priority" "priority" DEFAULT 'medium' NOT NULL,
+	"task_priority" "task_priority" DEFAULT 'medium' NOT NULL,
 	"status" "status" DEFAULT 'todo' NOT NULL,
 	"progress" integer DEFAULT 0 NOT NULL,
 	"start_date" timestamp NOT NULL,

@@ -69,7 +69,7 @@ export const tasks = pgTable("tasks", {
     userId: text("user_id").notNull().references(() => user.id),
     title: varchar("title", { length: 255 }).notNull(),
     content: text("content"),
-    priority: priorityEnum("priority").default("medium").notNull(),
+    priority: priorityEnum("task_priority").default("medium").notNull(),
     status: statusEnum("status").default("todo").notNull(),
     progress: integer("progress").default(0).notNull(),
     startDate: timestamp("start_date", { mode: "date" }).notNull(),
