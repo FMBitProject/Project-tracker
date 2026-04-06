@@ -8,8 +8,9 @@ export const user = pgTable("user", {
     email: text("email").notNull().unique(),
     emailVerified: timestamp("emailVerified", { mode: "date" }),
     image: text("image"),
-    createdAt: timestamp("createdAt", { mode: "date" }).notNull(),
-    updatedAt: timestamp("updatedAt", { mode: "date" }).notNull(),
+    // Tambahkan $defaultFn untuk menjamin ini adalah Date object
+    createdAt: timestamp("createdAt", { mode: "date" }).$defaultFn(() => new Date()).notNull(),
+    updatedAt: timestamp("updatedAt", { mode: "date" }).$defaultFn(() => new Date()).$onUpdate(() => new Date()).notNull(),
 });
 
 // Better-Auth Session table (export name MUST be "session" for better-auth)
@@ -17,8 +18,8 @@ export const session = pgTable("session", {
     id: text("id").primaryKey(),
     expiresAt: timestamp("expiresAt", { mode: "date" }).notNull(),
     token: text("token").notNull().unique(),
-    createdAt: timestamp("createdAt", { mode: "date" }).notNull(),
-    updatedAt: timestamp("updatedAt", { mode: "date" }).notNull(),
+    createdAt: timestamp("createdAt", { mode: "date" }).$defaultFn(() => new Date()).notNull(),
+    updatedAt: timestamp("updatedAt", { mode: "date" }).$defaultFn(() => new Date()).$onUpdate(() => new Date()).notNull(),
     ipAddress: text("ipAddress"),
     userAgent: text("userAgent"),
     userId: text("userId").notNull().references(() => user.id, { onDelete: "cascade" }),
@@ -37,8 +38,8 @@ export const account = pgTable("account", {
     refreshTokenExpiresAt: timestamp("refreshTokenExpiresAt", { mode: "date" }),
     scope: text("scope"),
     password: text("password"),
-    createdAt: timestamp("createdAt", { mode: "date" }).notNull(),
-    updatedAt: timestamp("updatedAt", { mode: "date" }).notNull(),
+    createdAt: timestamp("createdAt", { mode: "date" }).$defaultFn(() => new Date()).notNull(),
+    updatedAt: timestamp("updatedAt", { mode: "date" }).$defaultFn(() => new Date()).$onUpdate(() => new Date()).notNull(),
 });
 
 // Better-Auth Verification table (export name MUST be "verification" for better-auth)
@@ -47,8 +48,8 @@ export const verification = pgTable("verification", {
     identifier: text("identifier").notNull(),
     value: text("value").notNull(),
     expiresAt: timestamp("expiresAt", { mode: "date" }).notNull(),
-    createdAt: timestamp("createdAt", { mode: "date" }),
-    updatedAt: timestamp("updatedAt", { mode: "date" }),
+    createdAt: timestamp("createdAt", { mode: "date" }).$defaultFn(() => new Date()),
+    updatedAt: timestamp("updatedAt", { mode: "date" }).$defaultFn(() => new Date()).$onUpdate(() => new Date()),
 });
 
 // Projects table
@@ -57,8 +58,8 @@ export const projects = pgTable("projects", {
     name: varchar("name", { length: 255 }).notNull(),
     description: text("description"),
     userId: text("user_id").notNull().references(() => user.id),
-    createdAt: timestamp("created_at").defaultNow().notNull(),
-    updatedAt: timestamp("updated_at").defaultNow().$onUpdate(() => new Date()),
+    createdAt: timestamp("created_at", { mode: "date" }).defaultNow().notNull(),
+    updatedAt: timestamp("updated_at", { mode: "date" }).defaultNow().$onUpdate(() => new Date()),
 });
 
 // Tasks table
@@ -71,10 +72,10 @@ export const tasks = pgTable("tasks", {
     priority: priorityEnum("priority").default("medium").notNull(),
     status: statusEnum("status").default("todo").notNull(),
     progress: integer("progress").default(0).notNull(),
-    startDate: timestamp("start_date").notNull(),
-    endDate: timestamp("end_date").notNull(),
-    createdAt: timestamp("created_at").defaultNow().notNull(),
-    updatedAt: timestamp("updated_at").defaultNow().$onUpdate(() => new Date()),
+    startDate: timestamp("start_date", { mode: "date" }).notNull(),
+    endDate: timestamp("end_date", { mode: "date" }).notNull(),
+    createdAt: timestamp("created_at", { mode: "date" }).defaultNow().notNull(),
+    updatedAt: timestamp("updated_at", { mode: "date" }).defaultNow().$onUpdate(() => new Date()),
 });
 
 // Types
