@@ -19,7 +19,23 @@
       "Bash(node *)",
       "Bash(curl *)",
       "Bash(sleep *)",
-      "Bash(xargs *)"
+      "Bash(xargs *)",
+      "Bash(journalctl *)",
+      "Bash(dmesg)",
+      "Bash(cd *)",
+      "Bash(ss *)",
+      "Bash(netstat *)",
+      "Bash(rm *)",
+      "Bash(head *)",
+      "Bash(free *)",
+      "Bash(ls *)",
+      "Bash(timeout *)",
+      "Bash(nohup *)",
+      "Bash(ps *)",
+      "Bash(grep *)",
+      "Bash(touch *)",
+      "Bash(cat *)",
+      "Bash(find *)"
     ]
   },
   "$version": 3
