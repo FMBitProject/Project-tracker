@@ -277,51 +277,57 @@ export default function DashboardPage() {
 
       {/* Quick Actions */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card className="border-0 shadow-md bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-950/40 dark:to-pink-950/40 hover:shadow-lg transition-all group">
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-4">
-              <div className="p-3 rounded-xl bg-purple-100 dark:bg-purple-900/50 group-hover:bg-purple-200 dark:group-hover:bg-purple-800/50 transition-colors">
-                <Zap className="h-6 w-6 text-purple-600 dark:text-purple-400" />
+        <Link href="/tasks" className="group">
+          <Card className="border shadow-sm hover:shadow-md hover:border-primary/50 transition-all duration-200 cursor-pointer bg-card text-card-foreground h-full">
+            <CardContent className="pt-6">
+              <div className="flex items-center gap-4">
+                <div className="p-3 rounded-xl bg-primary/10 group-hover:bg-primary/20 transition-colors">
+                  <Zap className="h-6 w-6 text-primary" />
+                </div>
+                <div>
+                  <p className="text-sm font-semibold">Quick Stats</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    {projects.length} project{projects.length !== 1 ? "s" : ""} • {stats.totalTasks} task{stats.totalTasks !== 1 ? "s" : ""}
+                  </p>
+                </div>
               </div>
-              <div>
-                <p className="text-sm font-semibold text-foreground">Quick Stats</p>
-                <p className="text-xs text-muted-foreground mt-0.5">
-                  {projects.length} project{projects.length !== 1 ? "s" : ""} • {stats.totalTasks} task{stats.totalTasks !== 1 ? "s" : ""}
-                </p>
+            </CardContent>
+          </Card>
+        </Link>
+        <Link href="/tasks?status=completed" className="group">
+          <Card className="border shadow-sm hover:shadow-md hover:border-primary/50 transition-all duration-200 cursor-pointer bg-card text-card-foreground h-full">
+            <CardContent className="pt-6">
+              <div className="flex items-center gap-4">
+                <div className="p-3 rounded-xl bg-primary/10 group-hover:bg-primary/20 transition-colors">
+                  <Target className="h-6 w-6 text-primary" />
+                </div>
+                <div>
+                  <p className="text-sm font-semibold">Completion Rate</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    {stats.completionRate}% of all tasks completed
+                  </p>
+                </div>
               </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card className="border-0 shadow-md bg-gradient-to-r from-cyan-50 to-blue-50 dark:from-cyan-950/40 dark:to-blue-950/40 hover:shadow-lg transition-all group">
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-4">
-              <div className="p-3 rounded-xl bg-cyan-100 dark:bg-cyan-900/50 group-hover:bg-cyan-200 dark:group-hover:bg-cyan-800/50 transition-colors">
-                <Target className="h-6 w-6 text-cyan-600 dark:text-cyan-400" />
+            </CardContent>
+          </Card>
+        </Link>
+        <Link href="/tasks?filter=review" className="group">
+          <Card className="border shadow-sm hover:shadow-md hover:border-primary/50 transition-all duration-200 cursor-pointer bg-card text-card-foreground h-full">
+            <CardContent className="pt-6">
+              <div className="flex items-center gap-4">
+                <div className="p-3 rounded-xl bg-primary/10 group-hover:bg-primary/20 transition-colors">
+                  <AlertCircle className="h-6 w-6 text-primary" />
+                </div>
+                <div>
+                  <p className="text-sm font-semibold">Attention Needed</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    {stats.criticalTasks + stats.overdueTasks} task{stats.criticalTasks + stats.overdueTasks !== 1 ? "s" : ""} need review
+                  </p>
+                </div>
               </div>
-              <div>
-                <p className="text-sm font-semibold text-foreground">Completion Rate</p>
-                <p className="text-xs text-muted-foreground mt-0.5">
-                  {stats.completionRate}% of all tasks completed
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card className="border-0 shadow-md bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-950/40 dark:to-orange-950/40 hover:shadow-lg transition-all group">
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-4">
-              <div className="p-3 rounded-xl bg-amber-100 dark:bg-amber-900/50 group-hover:bg-amber-200 dark:group-hover:bg-amber-800/50 transition-colors">
-                <AlertCircle className="h-6 w-6 text-amber-600 dark:text-amber-400" />
-              </div>
-              <div>
-                <p className="text-sm font-semibold text-foreground">Attention Needed</p>
-                <p className="text-xs text-muted-foreground mt-0.5">
-                  {stats.criticalTasks + stats.overdueTasks} task{stats.criticalTasks + stats.overdueTasks !== 1 ? "s" : ""} need review
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        </Link>
       </div>
 
       {/* Projects Section */}
