@@ -78,15 +78,18 @@ export async function PATCH(
 
         return NextResponse.json(updatedTask);
     } catch (error) {
-        console.error("Error updating task:", error);
         if (error instanceof Error && error.name === "ZodError") {
+            const zodError = error as import("zod").ZodError;
+            console.error("Zod validation error:", zodError.flatten());
             return NextResponse.json(
-                { error: "Validation failed", details: error },
+                { error: "Validation failed", details: zodError.flatten() },
                 { status: 400 }
             );
         }
+        const anyErr = error as any;
+        console.error("Error updating task:", anyErr?.cause?.message || anyErr?.message);
         return NextResponse.json(
-            { error: "Failed to update task" },
+            { error: "Failed to update task", detail: anyErr?.message || "Unknown database error" },
             { status: 500 }
         );
     }

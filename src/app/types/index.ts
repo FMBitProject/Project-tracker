@@ -27,6 +27,12 @@ export const updateTaskSchema = z.object({
     priority: z.enum(["low", "medium", "high", "critical"]).optional(),
     status: z.enum(["todo", "in_progress", "review", "done"]).optional(),
     progress: z.number().min(0).max(100).optional(),
-    startDate: z.string().transform((val) => new Date(val)).optional(),
-    endDate: z.string().transform((val) => new Date(val)).optional(),
+    startDate: z.preprocess(
+        (val) => val === undefined ? undefined : new Date(val as string),
+        z.date().optional()
+    ),
+    endDate: z.preprocess(
+        (val) => val === undefined ? undefined : new Date(val as string),
+        z.date().optional()
+    ),
 });

@@ -15,6 +15,7 @@ import {
     CheckCircle2,
     Loader2,
     Calendar as CalendarIcon,
+    ChevronRight,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -156,6 +157,51 @@ export default function ProjectDetailPage() {
             }
         } catch (error) {
             console.error("Error deleting task:", error);
+        }
+    }
+
+    const STATUS_ORDER: Task["status"][] = ["todo", "in_progress", "review", "done"];
+
+    async function handleCycleStatus(taskId: string, currentStatus: Task["status"]) {
+        const currentIndex = STATUS_ORDER.indexOf(currentStatus);
+        const nextStatus = STATUS_ORDER[(currentIndex + 1) % STATUS_ORDER.length];
+
+        // Optimistic update
+        setProject((prev) => {
+            if (!prev) return prev;
+            return {
+                ...prev,
+                tasks: prev.tasks.map((t) =>
+                    t.id === taskId ? { ...t, status: nextStatus } : t
+                ),
+            };
+        });
+
+        try {
+            const response = await fetch(`/api/tasks/${taskId}`, {
+                method: "PATCH",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ status: nextStatus }),
+            });
+
+            if (!response.ok) {
+                // Safe JSON parsing — backend mungkin tidak kirim JSON yang valid
+                let errorMsg = `Server returned ${response.status}`;
+                try {
+                    const err = await response.json();
+                    errorMsg = err.error || err.message || errorMsg;
+                    if (err.detail) {
+                        console.error("Server error detail:", err.detail);
+                    }
+                } catch {
+                    // Body kosong / bukan JSON — pakai default message
+                }
+                console.error("Status update failed:", errorMsg);
+                fetchProject(); // Rollback
+            }
+        } catch (error) {
+            console.error("Error updating task status:", error);
+            fetchProject(); // Rollback
         }
     }
 
@@ -362,6 +408,18 @@ export default function ProjectDetailPage() {
                                                 </div>
                                             </div>
                                             <div className="flex items-center gap-1 ml-4">
+                                                <Button
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    className="h-8 w-8 text-emerald-500 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-950/40"
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        handleCycleStatus(task.id, task.status);
+                                                    }}
+                                                    title={`Change status (currently: ${statusLabels[task.status]})`}
+                                                >
+                                                    <ChevronRight className="h-4 w-4" />
+                                                </Button>
                                                 <Button
                                                     variant="ghost"
                                                     size="icon"

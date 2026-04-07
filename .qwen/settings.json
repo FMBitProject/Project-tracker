@@ -36,7 +36,9 @@
       "Bash(touch *)",
       "Bash(cat *)",
       "Bash(find *)",
-      "Bash(source *)"
+      "Bash(source *)",
+      "Bash(docker compose ps)",
+      "Bash(cut *)"
     ]
   },
   "$version": 3
