@@ -25,6 +25,7 @@ import {
   Zap,
   Target,
   AlertCircle,
+  Pencil,
 } from "lucide-react";
 
 interface Project {
@@ -70,6 +71,8 @@ export default function DashboardPage() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [renamingId, setRenamingId] = useState<string | null>(null);
+  const [renameValue, setRenameValue] = useState("");
 
   const fetchProjects = useCallback(async () => {
     try {
@@ -158,6 +161,38 @@ export default function DashboardPage() {
       await fetchProjects();
     } catch (err) {
       alert(err instanceof Error ? err.message : "Failed to delete project");
+    }
+  };
+
+  const startRename = (project: Project) => {
+    setRenamingId(project.id);
+    setRenameValue(project.name);
+  };
+
+  const cancelRename = () => {
+    setRenamingId(null);
+    setRenameValue("");
+  };
+
+  const submitRename = async (projectId: string) => {
+    const trimmed = renameValue.trim();
+    if (!trimmed) return;
+
+    try {
+      const res = await fetch(`/api/projects/${projectId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: trimmed }),
+      });
+
+      if (!res.ok) {
+        throw new Error("Failed to rename project");
+      }
+
+      await fetchProjects();
+      cancelRename();
+    } catch (err) {
+      alert(err instanceof Error ? err.message : "Failed to rename project");
     }
   };
 
@@ -277,7 +312,7 @@ export default function DashboardPage() {
 
       {/* Quick Actions */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Link href="/tasks" className="group">
+        <Link href="/projects" className="group">
           <Card className="border shadow-sm hover:shadow-md hover:border-primary/50 transition-all duration-200 cursor-pointer bg-card text-card-foreground h-full">
             <CardContent className="pt-6">
               <div className="flex items-center gap-4">
@@ -294,7 +329,7 @@ export default function DashboardPage() {
             </CardContent>
           </Card>
         </Link>
-        <Link href="/tasks?status=completed" className="group">
+        <Link href="/projects" className="group">
           <Card className="border shadow-sm hover:shadow-md hover:border-primary/50 transition-all duration-200 cursor-pointer bg-card text-card-foreground h-full">
             <CardContent className="pt-6">
               <div className="flex items-center gap-4">
@@ -311,7 +346,7 @@ export default function DashboardPage() {
             </CardContent>
           </Card>
         </Link>
-        <Link href="/tasks?filter=review" className="group">
+        <Link href="/projects" className="group">
           <Card className="border shadow-sm hover:shadow-md hover:border-primary/50 transition-all duration-200 cursor-pointer bg-card text-card-foreground h-full">
             <CardContent className="pt-6">
               <div className="flex items-center gap-4">
@@ -373,10 +408,55 @@ export default function DashboardPage() {
 
                   <CardHeader className="pb-3">
                     <div className="flex items-start justify-between gap-2">
-                      <CardTitle className="text-lg font-bold text-foreground line-clamp-1 group-hover:text-purple-500 transition-colors">
-                        {project.name}
-                      </CardTitle>
+                      {renamingId === project.id ? (
+                        <div className="flex items-center gap-2 flex-1 min-w-0">
+                          <input
+                            type="text"
+                            value={renameValue}
+                            onChange={(e) => setRenameValue(e.target.value)}
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter") {
+                                e.preventDefault();
+                                submitRename(project.id);
+                              }
+                              if (e.key === "Escape") cancelRename();
+                            }}
+                            autoFocus
+                            className="w-full px-2 py-1 text-lg font-bold border border-primary/50 rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                          />
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 shrink-0 text-green-500 hover:text-green-600 hover:bg-green-50 dark:hover:bg-green-950/40"
+                            onClick={() => submitRename(project.id)}
+                          >
+                            <CheckCircle className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 shrink-0 text-red-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/40"
+                            onClick={cancelRename}
+                          >
+                            <X className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      ) : (
+                        <CardTitle className="text-lg font-bold text-foreground line-clamp-1 group-hover:text-purple-500 transition-colors">
+                          {project.name}
+                        </CardTitle>
+                      )}
                       <div className="flex items-center gap-1 shrink-0">
+                        {renamingId !== project.id && (
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 text-muted-foreground hover:text-foreground hover:bg-accent"
+                            onClick={() => startRename(project)}
+                          >
+                            <Pencil className="h-4 w-4" />
+                          </Button>
+                        )}
                         <Button
                           asChild
                           variant="ghost"
