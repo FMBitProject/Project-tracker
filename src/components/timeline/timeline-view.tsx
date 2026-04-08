@@ -4,7 +4,6 @@ import { useEffect, useState, useMemo } from "react";
 import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
     ChevronLeft,
     ChevronRight,
@@ -261,15 +260,28 @@ export function Timeline({ view = "month" }: TimelineProps) {
                                 Today
                             </Button>
                         </CardTitle>
-                        <Select value={timelineView} onValueChange={(v) => setTimelineView(v as "month" | "week")}>
-                            <SelectTrigger className="w-32">
-                                <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="month">Month</SelectItem>
-                                <SelectItem value="week">Week</SelectItem>
-                            </SelectContent>
-                        </Select>
+                        <div className="flex rounded-lg border overflow-hidden">
+                            <button
+                                onClick={() => setTimelineView("month")}
+                                className={`px-4 py-1.5 text-sm font-medium transition-colors ${
+                                    timelineView === "month"
+                                        ? "bg-primary text-primary-foreground"
+                                        : "bg-background text-muted-foreground hover:text-foreground"
+                                }`}
+                            >
+                                Month
+                            </button>
+                            <button
+                                onClick={() => setTimelineView("week")}
+                                className={`px-4 py-1.5 text-sm font-medium transition-colors border-l ${
+                                    timelineView === "week"
+                                        ? "bg-primary text-primary-foreground"
+                                        : "bg-background text-muted-foreground hover:text-foreground"
+                                }`}
+                            >
+                                Week
+                            </button>
+                        </div>
                     </div>
                 </CardHeader>
 
