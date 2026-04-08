@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useSession } from "@/auth/client";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -64,6 +65,8 @@ const projectGradients = [
 
 export default function DashboardPage() {
   const router = useRouter();
+  const { data: session } = useSession();
+  const userName = session?.user?.name || "";
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [projectName, setProjectName] = useState("");
   const [projectDescription, setProjectDescription] = useState("");
@@ -209,7 +212,7 @@ export default function DashboardPage() {
         <div className="relative flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <h1 className="text-4xl font-extrabold tracking-tight drop-shadow-lg">
-              Welcome back! 👋
+              Welcome back, {userName || "there"}! 👋
             </h1>
             <p className="text-sm text-white/80 mt-2 max-w-md">
               Here&apos;s what&apos;s happening with your projects today.
@@ -255,58 +258,94 @@ export default function DashboardPage() {
         </Card>
 
         {/* Card 2: Completed */}
-        <Card className="relative overflow-hidden border-0 shadow-lg bg-gradient-to-br from-emerald-500 to-green-700 text-white transition-all hover:shadow-xl hover:-translate-y-1 group">
-          <div className="absolute -right-4 -top-4 h-24 w-24 rounded-full bg-white/10 transition-transform group-hover:scale-125" />
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-semibold">Completed</CardTitle>
-            <div className="p-2 rounded-lg bg-white/20">
-              <CheckCircle className="h-5 w-5" />
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="text-4xl font-extrabold">
-              {isLoading ? <Loader2 className="h-9 w-9 animate-spin" /> : stats.completedTasks}
-            </div>
-            <div className="flex items-center gap-1 mt-1">
-              <TrendingUp className="h-3 w-3 text-white/80" />
-              <p className="text-xs font-medium text-white/80">{stats.completionRate}% completion rate</p>
-            </div>
-          </CardContent>
-        </Card>
+        <div
+          onClick={() => {
+            if (isLoading || projects.length === 0) return;
+            // Find project with the most completed tasks
+            const best = projects.reduce((a, b) =>
+              b.summary.completedTasks > a.summary.completedTasks ? b : a
+            );
+            router.push(`/projects/${best.id}?status=done`);
+          }}
+          className="group cursor-pointer"
+        >
+          <Card className="relative overflow-hidden border-0 shadow-lg bg-gradient-to-br from-emerald-500 to-green-700 text-white transition-all hover:shadow-xl hover:-translate-y-1">
+            <div className="absolute -right-4 -top-4 h-24 w-24 rounded-full bg-white/10 transition-transform group-hover:scale-125" />
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-semibold">Completed</CardTitle>
+              <div className="p-2 rounded-lg bg-white/20">
+                <CheckCircle className="h-5 w-5" />
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="text-4xl font-extrabold">
+                {isLoading ? <Loader2 className="h-9 w-9 animate-spin" /> : stats.completedTasks}
+              </div>
+              <div className="flex items-center gap-1 mt-1">
+                <TrendingUp className="h-3 w-3 text-white/80" />
+                <p className="text-xs font-medium text-white/80">{stats.completionRate}% completion rate</p>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
 
         {/* Card 3: Critical */}
-        <Card className="relative overflow-hidden border-0 shadow-lg bg-gradient-to-br from-red-500 to-rose-700 text-white transition-all hover:shadow-xl hover:-translate-y-1 group">
-          <div className="absolute -right-4 -top-4 h-24 w-24 rounded-full bg-white/10 transition-transform group-hover:scale-125" />
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-semibold">Critical</CardTitle>
-            <div className="p-2 rounded-lg bg-white/20">
-              <AlertTriangle className="h-5 w-5" />
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="text-4xl font-extrabold">
-              {isLoading ? <Loader2 className="h-9 w-9 animate-spin" /> : stats.criticalTasks}
-            </div>
-            <p className="text-xs font-medium text-white/80 mt-1">Needs immediate attention</p>
-          </CardContent>
-        </Card>
+        <div
+          onClick={() => {
+            if (isLoading || projects.length === 0) return;
+            const best = projects.reduce((a, b) =>
+              b.summary.criticalTasks > a.summary.criticalTasks ? b : a
+            );
+            if (best.summary.criticalTasks === 0) return;
+            router.push(`/projects/${best.id}?filter=critical`);
+          }}
+          className="group cursor-pointer"
+        >
+          <Card className="relative overflow-hidden border-0 shadow-lg bg-gradient-to-br from-red-500 to-rose-700 text-white transition-all hover:shadow-xl hover:-translate-y-1">
+            <div className="absolute -right-4 -top-4 h-24 w-24 rounded-full bg-white/10 transition-transform group-hover:scale-125" />
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-semibold">Critical</CardTitle>
+              <div className="p-2 rounded-lg bg-white/20">
+                <AlertTriangle className="h-5 w-5" />
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="text-4xl font-extrabold">
+                {isLoading ? <Loader2 className="h-9 w-9 animate-spin" /> : stats.criticalTasks}
+              </div>
+              <p className="text-xs font-medium text-white/80 mt-1">Needs immediate attention</p>
+            </CardContent>
+          </Card>
+        </div>
 
         {/* Card 4: Overdue */}
-        <Card className="relative overflow-hidden border-0 shadow-lg bg-gradient-to-br from-amber-500 to-orange-700 text-white transition-all hover:shadow-xl hover:-translate-y-1 group">
-          <div className="absolute -right-4 -top-4 h-24 w-24 rounded-full bg-white/10 transition-transform group-hover:scale-125" />
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-semibold">Overdue</CardTitle>
-            <div className="p-2 rounded-lg bg-white/20">
-              <Clock className="h-5 w-5" />
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="text-4xl font-extrabold">
-              {isLoading ? <Loader2 className="h-9 w-9 animate-spin" /> : stats.overdueTasks}
-            </div>
-            <p className="text-xs font-medium text-white/80 mt-1">Past deadline</p>
-          </CardContent>
-        </Card>
+        <div
+          onClick={() => {
+            if (isLoading || projects.length === 0) return;
+            const best = projects.reduce((a, b) =>
+              b.summary.overdueTasks > a.summary.overdueTasks ? b : a
+            );
+            if (best.summary.overdueTasks === 0) return;
+            router.push(`/projects/${best.id}?filter=overdue`);
+          }}
+          className="group cursor-pointer"
+        >
+          <Card className="relative overflow-hidden border-0 shadow-lg bg-gradient-to-br from-amber-500 to-orange-700 text-white transition-all hover:shadow-xl hover:-translate-y-1">
+            <div className="absolute -right-4 -top-4 h-24 w-24 rounded-full bg-white/10 transition-transform group-hover:scale-125" />
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-semibold">Overdue</CardTitle>
+              <div className="p-2 rounded-lg bg-white/20">
+                <Clock className="h-5 w-5" />
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="text-4xl font-extrabold">
+                {isLoading ? <Loader2 className="h-9 w-9 animate-spin" /> : stats.overdueTasks}
+              </div>
+              <p className="text-xs font-medium text-white/80 mt-1">Past deadline</p>
+            </CardContent>
+          </Card>
+        </div>
 
       </div>
 

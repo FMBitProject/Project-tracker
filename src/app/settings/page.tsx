@@ -5,26 +5,80 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { signOut } from "@/auth/client";
-import { User, LogOut, Key } from "lucide-react";
+import { signOut, useSession } from "@/auth/client";
+import { authClient } from "@/auth/client";
+import { User, LogOut, Key, Loader2, CheckCircle2 } from "lucide-react";
 
 export default function SettingsPage() {
+    const { data: session } = useSession();
     const [userName, setUserName] = useState("");
     const [userEmail, setUserEmail] = useState("");
-    const [isLoading, setIsLoading] = useState(true);
+    const [isSaving, setIsSaving] = useState(false);
+    const [isSaved, setIsSaved] = useState(false);
+    const [currentPassword, setCurrentPassword] = useState("");
+    const [newPassword, setNewPassword] = useState("");
+    const [isUpdatingPassword, setIsUpdatingPassword] = useState(false);
+    const [passwordMsg, setPasswordMsg] = useState("");
 
     useEffect(() => {
-        // Fetch user info from session (this would typically come from your auth context)
-        // For now, we'll just show placeholder data
-        setIsLoading(false);
-    }, []);
+        if (session?.user) {
+            setUserName(session.user.name || "");
+            setUserEmail(session.user.email || "");
+        }
+    }, [session]);
+
+    const handleSaveProfile = async () => {
+        if (!userName.trim()) return;
+        setIsSaving(true);
+        setIsSaved(false);
+        try {
+            await authClient.updateUser({
+                name: userName.trim(),
+            });
+            setIsSaved(true);
+            setTimeout(() => setIsSaved(false), 2000);
+        } catch (error) {
+            console.error("Failed to update profile:", error);
+            alert("Failed to update profile");
+        } finally {
+            setIsSaving(false);
+        }
+    };
+
+    const handleUpdatePassword = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!currentPassword || !newPassword) {
+            setPasswordMsg("Both fields are required");
+            return;
+        }
+        if (newPassword.length < 8) {
+            setPasswordMsg("Password must be at least 8 characters");
+            return;
+        }
+        setIsUpdatingPassword(true);
+        setPasswordMsg("");
+        try {
+            await authClient.changePassword({
+                currentPassword,
+                newPassword,
+                revokeOtherSessions: true,
+            });
+            setPasswordMsg("Password updated successfully!");
+            setCurrentPassword("");
+            setNewPassword("");
+        } catch (error) {
+            setPasswordMsg("Failed to update password. Check your current password.");
+        } finally {
+            setIsUpdatingPassword(false);
+        }
+    };
 
     const handleSignOut = async () => {
         await signOut();
         window.location.href = "/auth/signin";
     };
 
-    if (isLoading) {
+    if (!session) {
         return <div className="flex items-center justify-center h-64">Loading...</div>;
     }
 
@@ -51,13 +105,42 @@ export default function SettingsPage() {
                 <CardContent className="space-y-4">
                     <div className="grid gap-2">
                         <Label htmlFor="name">Name</Label>
-                        <Input id="name" value={userName} onChange={(e) => setUserName(e.target.value)} placeholder="Your name" />
+                        <Input
+                            id="name"
+                            value={userName}
+                            onChange={(e) => setUserName(e.target.value)}
+                            placeholder="Your name"
+                        />
                     </div>
                     <div className="grid gap-2">
                         <Label htmlFor="email">Email</Label>
-                        <Input id="email" type="email" value={userEmail} onChange={(e) => setUserEmail(e.target.value)} placeholder="your@email.com" />
+                        <Input
+                            id="email"
+                            type="email"
+                            value={userEmail}
+                            readOnly
+                            className="bg-muted cursor-not-allowed"
+                        />
+                        <p className="text-xs text-muted-foreground">Email cannot be changed</p>
                     </div>
-                    <Button>Save Changes</Button>
+                    <Button
+                        onClick={handleSaveProfile}
+                        disabled={isSaving || !userName.trim()}
+                    >
+                        {isSaving ? (
+                            <>
+                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                Saving...
+                            </>
+                        ) : isSaved ? (
+                            <>
+                                <CheckCircle2 className="mr-2 h-4 w-4" />
+                                Saved!
+                            </>
+                        ) : (
+                            "Save Changes"
+                        )}
+                    </Button>
                 </CardContent>
             </Card>
 
@@ -69,19 +152,43 @@ export default function SettingsPage() {
                         <CardTitle>Security</CardTitle>
                     </div>
                     <CardDescription>
-                        Manage your password and security settings
+                        Manage your password
                     </CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-4">
-                    <div className="grid gap-2">
-                        <Label htmlFor="current-password">Current Password</Label>
-                        <Input id="current-password" type="password" />
-                    </div>
-                    <div className="grid gap-2">
-                        <Label htmlFor="new-password">New Password</Label>
-                        <Input id="new-password" type="password" />
-                    </div>
-                    <Button>Update Password</Button>
+                <CardContent>
+                    <form onSubmit={handleUpdatePassword} className="space-y-4">
+                        <div className="grid gap-2">
+                            <Label htmlFor="current-password">Current Password</Label>
+                            <Input
+                                id="current-password"
+                                type="password"
+                                value={currentPassword}
+                                onChange={(e) => setCurrentPassword(e.target.value)}
+                            />
+                        </div>
+                        <div className="grid gap-2">
+                            <Label htmlFor="new-password">New Password</Label>
+                            <Input
+                                id="new-password"
+                                type="password"
+                                value={newPassword}
+                                onChange={(e) => setNewPassword(e.target.value)}
+                            />
+                        </div>
+                        {passwordMsg && (
+                            <p className="text-sm text-muted-foreground">{passwordMsg}</p>
+                        )}
+                        <Button type="submit" disabled={isUpdatingPassword}>
+                            {isUpdatingPassword ? (
+                                <>
+                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                    Updating...
+                                </>
+                            ) : (
+                                "Update Password"
+                            )}
+                        </Button>
+                    </form>
                 </CardContent>
             </Card>
 
