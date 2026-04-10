@@ -16,10 +16,6 @@ export const auth = betterAuth({
     emailAndPassword: {
         enabled: true
     },
-    // Fitur tambahan agar sinkronisasi Cookie di Server Side (SSR) lancar
-    advanced: {
-        crossSsr: true,
-    },
     // Wajib didaftarkan karena URL IDX sangat panjang dan unik
     trustedOrigins: [
         "https://3000-firebase-project-tracker-1775093705756.cluster-cd3bsnf6r5bemwki2bxljme5as.cloudworkstations.dev"
