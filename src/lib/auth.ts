@@ -19,5 +19,6 @@ export const auth = betterAuth({
     // Wajib didaftarkan karena URL IDX sangat panjang dan unik
     trustedOrigins: [
         "https://3000-firebase-project-tracker-1775093705756.cluster-cd3bsnf6r5bemwki2bxljme5as.cloudworkstations.dev"
+        "https://project-tracker-chi-red.vercel.app"
     ],
 });
