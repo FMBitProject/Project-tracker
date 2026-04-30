@@ -17,6 +17,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Progress } from "@/components/ui/progress";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Calendar } from "@/components/ui/calendar";
+import { MarkdownRenderer } from "@/components/ui/markdown-renderer";
 import { AlertCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -293,13 +294,7 @@ export function TaskDetailModal({ task, open, onOpenChange, onUpdate }: TaskDeta
                             />
                         ) : (
                             <ScrollArea className="h-[300px] rounded-md border p-4">
-                                <div className="prose prose-sm dark:prose-invert max-w-none">
-                                    {task.content ? (
-                                        <pre className="whitespace-pre-wrap font-sans text-sm">{task.content}</pre>
-                                    ) : (
-                                        <p className="text-muted-foreground">No description added yet.</p>
-                                    )}
-                                </div>
+                                <MarkdownRenderer content={task.content} />
                             </ScrollArea>
                         )}
                     </div>
